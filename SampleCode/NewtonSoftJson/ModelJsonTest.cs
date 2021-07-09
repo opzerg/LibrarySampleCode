@@ -136,7 +136,6 @@ namespace SampleCode.NewtonSoftJson
         }
         #endregion
 
-
         #region Settings Using
 
         [TestMethod]
