@@ -154,7 +154,7 @@ namespace MyModel.MyNewtonJson
                     oldestFemale.Immediate = Person.ImmediateEnum.Mother;
                     // 딸
                     person.Immediate = Person.ImmediateEnum.Daughter;
-                    // 쌍둥이 혹은 형, 동생
+                    // 쌍둥이 혹은 오빠, 동생
                     foreach (var malePerson in genderGroups.Where(genderGroup => genderGroup.Key).SelectMany(genderGroup => genderGroup))
                     {
                         if (malePerson == oldestMale)
@@ -167,7 +167,7 @@ namespace MyModel.MyNewtonJson
                             malePerson.Immediate = Person.ImmediateEnum.Brother;
                     }
 
-                    // 쌍둥이 혹은 누나, 동생
+                    // 쌍둥이 혹은 언니, 동생
                     foreach (var femalePerson in genderGroups.Where(genderGroup => !genderGroup.Key).SelectMany(genderGroup => genderGroup))
                     {
                         if (femalePerson == oldestFemale)
