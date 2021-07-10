@@ -14,7 +14,9 @@ namespace MyModel
             Sister,
             Twin,
             Grandfather,
-            Grandmother
+            Grandmother,
+            Son,
+            Daughter
         }
 
         public string Name { get; set; }

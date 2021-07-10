@@ -52,5 +52,25 @@ namespace SampleCode
 
             TestContext.WriteLine($"{ReferenceEquals(thirdPerson, FirstPerson)}");
         }
+
+        [TestMethod]
+        public void ComparableMAX()
+        {
+            //
+            // new reference
+            //
+            Person thirdPerson = new()
+            {
+                Age = 2,
+                Name = "jr, choi"
+            };
+
+            Person[] people = new[] { thirdPerson, SecondPerson, FirstPerson };
+
+            //
+            // MAX Linq가 Comparable Interface를 사용
+            //
+            Assert.AreEqual(people.Max(person => person), SecondPerson);
+        }
     }
 }
