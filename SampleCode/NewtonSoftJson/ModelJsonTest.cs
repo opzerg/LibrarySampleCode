@@ -1,11 +1,13 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MyModel;
+using MyModel.MyNewtonJson;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 namespace SampleCode.NewtonSoftJson
@@ -228,6 +230,65 @@ namespace SampleCode.NewtonSoftJson
             // object name exclude
             //
             TestContext.WriteLine(JsonConvert.SerializeObject(FirstPerson, serializeSettings));
+        }
+
+        #endregion
+
+
+        #region Converter
+
+        [TestMethod]
+        public void PersonReadConverterTest()
+        {
+            //
+            // test 1.
+            // 1. first is father (age 29)
+            // 2. second is mother (age 32)
+            // 3. add 2 son, 2 dauther
+            //
+            FirstPerson.Gender = true;
+            SecondPerson.Gender = false;
+
+            FirstPerson.Family = new List<Person>();
+            FirstPerson.Family.Add(SecondPerson);
+            // dauther
+            FirstPerson.Family.Add(new() { Age = 1, Gender = false, Name = "second dauther"});
+            FirstPerson.Family.Add(new() { Age = 4, Gender = false, Name = "first dauther"});
+            // son
+            FirstPerson.Family.Add(new() { Age = 7, Gender = true, Name = "second son"});
+            FirstPerson.Family.Add(new() { Age = 10, Gender = true, Name = "first son"});
+
+            var person = JsonConvert.DeserializeObject<Person>(JsonConvert.SerializeObject(FirstPerson), new PersonReadConverter());
+            var people = new List<Person>(person.Family);
+            people.Insert(0, person);
+
+            TestContext.WriteLine(string.Join("\n", people.Select(person => $"[{person.Name}_{person.Immediate}]")));
+
+
+            TestContext.WriteLine("=================================");
+            //
+            // test 2.
+            // 1. first is son (age 29)
+            // 2. second is mother (age 32)
+            // 3. add 1 father, 1 dauther
+            //
+            FirstPerson.Gender = true;
+            SecondPerson.Gender = false;
+
+            FirstPerson.Family = new List<Person>();
+            FirstPerson.Family.Add(SecondPerson);
+
+            // father
+            FirstPerson.Family.Add(new() { Age = 55, Gender = true, Name = "first father" });
+            // son
+            FirstPerson.Family.Add(new() { Age = 10, Gender = false, Name = "first son" });
+
+            person = JsonConvert.DeserializeObject<Person>(JsonConvert.SerializeObject(FirstPerson), new PersonReadConverter());
+            people = new List<Person>(person.Family);
+            people.Insert(0, person);
+
+            TestContext.WriteLine(string.Join("\n", people.Select(person => $"[{person.Name}_{person.Immediate}]")));
+
         }
 
         #endregion

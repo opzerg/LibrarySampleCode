@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MyModel.MyNewtonJson
 {
-    internal class PersonReadConverter : JsonConverter
+    public class PersonReadConverter : JsonConverter
     {
         //
         // serialize
@@ -45,8 +45,13 @@ namespace MyModel.MyNewtonJson
             // 3-1. person이 남자면
             if (person.Gender)
             {
+                // 아무도 없으면 아빠
+                if(oldestMale is null)
+                {
+                    person.Immediate = Person.ImmediateEnum.Father;
+                }
                 // 3-1-1. person의 나이가 가장 많으면 person은 아빠
-                if (person.Age > oldestMale.Age)
+                else if (person.Age > oldestMale.Age)
                 {
                     person.Immediate = Person.ImmediateEnum.Father;
                     // 가장 나이가 많은 Female은 엄마
@@ -81,19 +86,24 @@ namespace MyModel.MyNewtonJson
                     // 아들
                     person.Immediate = Person.ImmediateEnum.Son;
                     // 쌍둥이 혹은 형, 동생
-                    foreach (var genderGroup in genderGroups.Where(genderGroup => genderGroup.Key).SelectMany(genderGroup => genderGroup))
+                    foreach (var malePerson in genderGroups.Where(genderGroup => genderGroup.Key).SelectMany(genderGroup => genderGroup))
                     {
-                        var result = person.CompareTo(genderGroup);
+                        if (malePerson == oldestMale)
+                            continue;
 
+                        var result = person.CompareTo(malePerson);
                         if (result == 0)
-                            genderGroup.Immediate = Person.ImmediateEnum.Twin;
+                            malePerson.Immediate = Person.ImmediateEnum.Twin;
                         else
-                            genderGroup.Immediate = Person.ImmediateEnum.Brother;
+                            malePerson.Immediate = Person.ImmediateEnum.Brother;
                     }
 
                     // 쌍둥이 혹은 누나, 동생
                     foreach (var femalePerson in genderGroups.Where(genderGroup => !genderGroup.Key).SelectMany(genderGroup => genderGroup))
                     {
+                        if (femalePerson == oldestFemale)
+                            continue;
+
                         var result = person.CompareTo(femalePerson);
 
                         if (result == 0)
@@ -105,7 +115,12 @@ namespace MyModel.MyNewtonJson
             }
             else  // 3-2. person이 여자면
             {
-                if (person.Age > oldestFemale.Age)
+                // 아무도 없으면 엄마
+                if(oldestFemale is null)
+                {
+                    person.Immediate = Person.ImmediateEnum.Mother;
+                }
+                else if (person.Age > oldestFemale.Age)
                 {
                     person.Immediate = Person.ImmediateEnum.Mother;
                     // 가장 나이가 많은 Male은 아빠
@@ -139,20 +154,25 @@ namespace MyModel.MyNewtonJson
                     oldestFemale.Immediate = Person.ImmediateEnum.Mother;
                     // 딸
                     person.Immediate = Person.ImmediateEnum.Daughter;
-                    // 쌍둥이 혹은 오빠, 동생
+                    // 쌍둥이 혹은 형, 동생
                     foreach (var malePerson in genderGroups.Where(genderGroup => genderGroup.Key).SelectMany(genderGroup => genderGroup))
                     {
-                        var result = person.CompareTo(malePerson);
+                        if (malePerson == oldestMale)
+                            continue;
 
+                        var result = person.CompareTo(malePerson);
                         if (result == 0)
                             malePerson.Immediate = Person.ImmediateEnum.Twin;
                         else
                             malePerson.Immediate = Person.ImmediateEnum.Brother;
                     }
 
-                    // 쌍둥이 혹은 언니, 동생
+                    // 쌍둥이 혹은 누나, 동생
                     foreach (var femalePerson in genderGroups.Where(genderGroup => !genderGroup.Key).SelectMany(genderGroup => genderGroup))
                     {
+                        if (femalePerson == oldestFemale)
+                            continue;
+
                         var result = person.CompareTo(femalePerson);
 
                         if (result == 0)
