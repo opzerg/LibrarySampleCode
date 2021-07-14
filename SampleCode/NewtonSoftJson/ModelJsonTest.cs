@@ -291,6 +291,23 @@ namespace SampleCode.NewtonSoftJson
 
         }
 
+        [TestMethod]
+        public void PersonWriteConverterTest()
+        {
+            FirstPerson.Gender = null;
+
+            var nothing = JsonConvert.SerializeObject(FirstPerson, new JsonSerializerSettings() { Converters = new[] { new PersonWriteConverter() } });
+
+            var firstPersonJson = JsonConvert.SerializeObject(FirstPerson);
+
+            Assert.AreEqual(nothing, string.Empty);
+            Assert.IsFalse(string.IsNullOrEmpty(firstPersonJson));
+
+            TestContext.WriteLine($"use skip converter (if gender is null) {nothing}");
+            TestContext.WriteLine($"not use skip converter {firstPersonJson}");
+
+        }
+
         #endregion
     }
 }

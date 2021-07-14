@@ -33,17 +33,17 @@ namespace MyModel.MyNewtonJson
             // 1. 성별로 group
             var genderGroups = person.Family.GroupBy(family => family.Gender);
             // 2. 나이순으로 정렬
-            var oldestMale = genderGroups.Where(genderGroup => genderGroup.Key)
+            var oldestMale = genderGroups.Where(genderGroup => genderGroup.Key.Value)
                 .SelectMany(genderGroup => genderGroup)
                 .Max(genderGroup => genderGroup);
 
-            var oldestFemale = genderGroups.Where(genderGroup => !genderGroup.Key)
+            var oldestFemale = genderGroups.Where(genderGroup => !genderGroup.Key.Value)
                 .SelectMany(genderGroup => genderGroup)
                 .Max(genderGroup => genderGroup);
 
             // 3. person과 비교해서 구성원 Immediate 결정
             // 3-1. person이 남자면
-            if (person.Gender)
+            if (person.Gender.Value)
             {
                 // 아무도 없으면 아빠
                 if(oldestMale is null)
@@ -57,10 +57,10 @@ namespace MyModel.MyNewtonJson
                     // 가장 나이가 많은 Female은 엄마
                     oldestFemale.Immediate = Person.ImmediateEnum.Mother;
                     // 전부 아들
-                    SetImmediate(genderGroups, genderGroup => genderGroup.Key, Person.ImmediateEnum.Son);
+                    SetImmediate(genderGroups, genderGroup => genderGroup.Key.Value, Person.ImmediateEnum.Son);
                     // 전부 딸
                     // 엄마 제외
-                    SetImmediate(genderGroups, genderGroup => !genderGroup.Key, Person.ImmediateEnum.Daughter, p => p == oldestFemale);
+                    SetImmediate(genderGroups, genderGroup => !genderGroup.Key.Value, Person.ImmediateEnum.Daughter, p => p == oldestFemale);
                 }
                 else if (person.Age == oldestMale.Age) //3-1-2. 나이가 같으면 쌍둥이
                 {
@@ -72,10 +72,10 @@ namespace MyModel.MyNewtonJson
 
                     // 전부 아들
                     // 쌍둥이 제외
-                    SetImmediate(genderGroups, genderGroup => genderGroup.Key, Person.ImmediateEnum.Son, p => p == oldestMale);
+                    SetImmediate(genderGroups, genderGroup => genderGroup.Key.Value, Person.ImmediateEnum.Son, p => p == oldestMale);
                     // 전부 딸
                     // 엄마 제외
-                    SetImmediate(genderGroups, genderGroup => !genderGroup.Key, Person.ImmediateEnum.Daughter, p => p == oldestFemale);
+                    SetImmediate(genderGroups, genderGroup => !genderGroup.Key.Value, Person.ImmediateEnum.Daughter, p => p == oldestFemale);
                 }
                 else
                 {
@@ -86,31 +86,9 @@ namespace MyModel.MyNewtonJson
                     // 아들
                     person.Immediate = Person.ImmediateEnum.Son;
                     // 쌍둥이 혹은 형, 동생
-                    foreach (var malePerson in genderGroups.Where(genderGroup => genderGroup.Key).SelectMany(genderGroup => genderGroup))
-                    {
-                        if (malePerson == oldestMale)
-                            continue;
-
-                        var result = person.CompareTo(malePerson);
-                        if (result == 0)
-                            malePerson.Immediate = Person.ImmediateEnum.Twin;
-                        else
-                            malePerson.Immediate = Person.ImmediateEnum.Brother;
-                    }
-
+                    TwinOr(person, genderGroups, oldestMale, Person.ImmediateEnum.Brother);
                     // 쌍둥이 혹은 누나, 동생
-                    foreach (var femalePerson in genderGroups.Where(genderGroup => !genderGroup.Key).SelectMany(genderGroup => genderGroup))
-                    {
-                        if (femalePerson == oldestFemale)
-                            continue;
-
-                        var result = person.CompareTo(femalePerson);
-
-                        if (result == 0)
-                            femalePerson.Immediate = Person.ImmediateEnum.Twin;
-                        else
-                            femalePerson.Immediate = Person.ImmediateEnum.Sister;
-                    }
+                    TwinOr(person, genderGroups, oldestFemale, Person.ImmediateEnum.Sister);
                 }
             }
             else  // 3-2. person이 여자면
@@ -127,9 +105,9 @@ namespace MyModel.MyNewtonJson
                     oldestMale.Immediate = Person.ImmediateEnum.Father;
                     // 전부 아들
                     // 아빠 제외
-                    SetImmediate(genderGroups, genderGroup => genderGroup.Key, Person.ImmediateEnum.Son, p => p == oldestMale);
+                    SetImmediate(genderGroups, genderGroup => genderGroup.Key.Value, Person.ImmediateEnum.Son, p => p == oldestMale);
                     // 전부 딸
-                    SetImmediate(genderGroups, genderGroup => !genderGroup.Key, Person.ImmediateEnum.Daughter);
+                    SetImmediate(genderGroups, genderGroup => !genderGroup.Key.Value, Person.ImmediateEnum.Daughter);
                 }
                 else if (person.Age == oldestFemale.Age) //3-1-2. 나이가 같으면 쌍둥이
                 {
@@ -141,10 +119,10 @@ namespace MyModel.MyNewtonJson
 
                     // 전부 아들
                     // 아빠 제외
-                    SetImmediate(genderGroups, genderGroup => genderGroup.Key, Person.ImmediateEnum.Son, p => p == oldestMale);
+                    SetImmediate(genderGroups, genderGroup => genderGroup.Key.Value, Person.ImmediateEnum.Son, p => p == oldestMale);
                     // 전부 딸
                     // 쌍둥이 제외
-                    SetImmediate(genderGroups, genderGroup => !genderGroup.Key, Person.ImmediateEnum.Daughter, p => p == oldestFemale);
+                    SetImmediate(genderGroups, genderGroup => !genderGroup.Key.Value, Person.ImmediateEnum.Daughter, p => p == oldestFemale);
                 }
                 else
                 {
@@ -154,40 +132,34 @@ namespace MyModel.MyNewtonJson
                     oldestFemale.Immediate = Person.ImmediateEnum.Mother;
                     // 딸
                     person.Immediate = Person.ImmediateEnum.Daughter;
-                    // 쌍둥이 혹은 오빠, 동생
-                    foreach (var malePerson in genderGroups.Where(genderGroup => genderGroup.Key).SelectMany(genderGroup => genderGroup))
-                    {
-                        if (malePerson == oldestMale)
-                            continue;
-
-                        var result = person.CompareTo(malePerson);
-                        if (result == 0)
-                            malePerson.Immediate = Person.ImmediateEnum.Twin;
-                        else
-                            malePerson.Immediate = Person.ImmediateEnum.Brother;
-                    }
-
-                    // 쌍둥이 혹은 언니, 동생
-                    foreach (var femalePerson in genderGroups.Where(genderGroup => !genderGroup.Key).SelectMany(genderGroup => genderGroup))
-                    {
-                        if (femalePerson == oldestFemale)
-                            continue;
-
-                        var result = person.CompareTo(femalePerson);
-
-                        if (result == 0)
-                            femalePerson.Immediate = Person.ImmediateEnum.Twin;
-                        else
-                            femalePerson.Immediate = Person.ImmediateEnum.Sister;
-                    }
+                    // 쌍둥이 혹은 형, 동생
+                    TwinOr(person, genderGroups, oldestMale, Person.ImmediateEnum.Brother);
+                    // 쌍둥이 혹은 누나, 동생
+                    TwinOr(person, genderGroups, oldestFemale, Person.ImmediateEnum.Sister);
                 }
             }
 
             return person;
         }
 
-        private static void SetImmediate(IEnumerable<IGrouping<bool, Person>> genderGroups,
-            Func<IGrouping<bool, Person>, bool> gender,
+        private static void TwinOr(Person person, IEnumerable<IGrouping<bool?, Person>> genderGroups, Person oldest, Person.ImmediateEnum immediate)
+        {
+            foreach (var femalePerson in genderGroups.Where(genderGroup => !genderGroup.Key.Value).SelectMany(genderGroup => genderGroup))
+            {
+                if (femalePerson == oldest)
+                    continue;
+
+                var result = person.CompareTo(femalePerson);
+
+                if (result == 0)
+                    femalePerson.Immediate = Person.ImmediateEnum.Twin;
+                else
+                    femalePerson.Immediate = immediate;
+            }
+        }
+
+        private static void SetImmediate(IEnumerable<IGrouping<bool?, Person>> genderGroups,
+            Func<IGrouping<bool?, Person>, bool> gender,
             Person.ImmediateEnum immediate,
             Func<Person, bool> equals = null)
         {

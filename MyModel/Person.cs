@@ -13,8 +13,6 @@ namespace MyModel
             Brother,
             Sister,
             Twin,
-            Grandfather,
-            Grandmother,
             Son,
             Daughter
         }
@@ -24,7 +22,7 @@ namespace MyModel
         /// <summary>
         /// true: male, false female
         /// </summary>
-        public bool Gender { get; set; }
+        public bool? Gender { get; set; }
         public List<Person> Family { get; set; }
 
         //
