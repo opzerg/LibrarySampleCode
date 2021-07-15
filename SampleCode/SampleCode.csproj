@@ -17,6 +17,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MyModel\MyModel.csproj" />
+    <ProjectReference Include="..\YonggukUtils\YonggukUtils.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Windows.Forms.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
