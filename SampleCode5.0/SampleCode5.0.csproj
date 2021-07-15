@@ -4,6 +4,10 @@
     <TargetFramework>net5.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <AssemblyName>SampleCode5.0</AssemblyName>
+
+    <RootNamespace>SampleCode5.0</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,13 +21,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MyModel\MyModel.csproj" />
-    <ProjectReference Include="..\YonggukUtils\YonggukUtils.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="System.Windows.Forms">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Windows.Forms.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>
