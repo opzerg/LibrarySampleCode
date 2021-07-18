@@ -72,5 +72,28 @@ namespace SampleCode
             //
             Assert.AreEqual(people.Max(person => person), SecondPerson);
         }
+
+
+        [TestMethod]
+        public void EnumFlags()
+        {
+            // 이미지 파일 이면서 암호화
+            var imageEncrypt = MyStatus.Image | MyStatus.Encrypt;
+            Assert.IsTrue(imageEncrypt.HasFlag(MyStatus.Encrypt));
+            Assert.IsTrue(imageEncrypt.HasFlag(MyStatus.Image));
+            Assert.IsFalse(imageEncrypt.HasFlag(MyStatus.Text));
+
+            // 텍스트 파일 이면서 암호화
+            var textEncrypt = MyStatus.Text | MyStatus.Encrypt;
+            Assert.IsTrue(textEncrypt.HasFlag(MyStatus.Encrypt));
+            Assert.IsTrue(textEncrypt.HasFlag(MyStatus.Text));
+            Assert.IsFalse(textEncrypt.HasFlag(MyStatus.Image));
+
+            // 이미지 파일이면서 텍스트일 수 없음
+            // Text = 2, Image = 1이기 때문에 HasFlag에 Text만 포함됨.
+            var imageText = MyStatus.Text | MyStatus.Image;
+            Assert.IsFalse(textEncrypt.HasFlag(MyStatus.Image));
+            Assert.IsTrue(textEncrypt.HasFlag(MyStatus.Text));
+        }
     }
 }
