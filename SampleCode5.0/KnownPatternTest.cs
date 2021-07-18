@@ -77,6 +77,12 @@ namespace SampleCode
         [TestMethod]
         public void EnumFlags()
         {
+            // 비트 연산과 enum + flags attributes를 활용
+            // 0001 -> 1, 0010 -> 2, 0011 -> 3, 0100 -> 4
+            // 1(0001) or 2(0010) -> 3(0011)
+            // 1(0001) or 2(0010) or 4(0100) -> 7(0111)
+
+
             // 이미지 파일 이면서 암호화
             var imageEncrypt = MyStatus.Image | MyStatus.Encrypt;
             Assert.IsTrue(imageEncrypt.HasFlag(MyStatus.Encrypt));
