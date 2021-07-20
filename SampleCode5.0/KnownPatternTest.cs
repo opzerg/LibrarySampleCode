@@ -3,6 +3,7 @@ using MyModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -37,7 +38,7 @@ namespace SampleCode
         }
         #endregion
         [TestMethod]
-        public void Equatable()
+        public void EquatableTest()
         {
             //
             // new reference
@@ -54,7 +55,7 @@ namespace SampleCode
         }
 
         [TestMethod]
-        public void ComparableMAX()
+        public void ComparableMAXTest()
         {
             //
             // new reference
@@ -75,7 +76,7 @@ namespace SampleCode
 
 
         [TestMethod]
-        public void EnumFlags()
+        public void EnumFlagsTest()
         {
             // 비트 연산과 enum + flags attributes를 활용
             // 0001 -> 1, 0010 -> 2, 0011 -> 3, 0100 -> 4
@@ -100,6 +101,41 @@ namespace SampleCode
             var imageText = MyStatus.Text | MyStatus.Image;
             Assert.IsFalse(textEncrypt.HasFlag(MyStatus.Image));
             Assert.IsTrue(textEncrypt.HasFlag(MyStatus.Text));
+        }
+
+        [TestMethod]
+        public void EnumAttributeTest()
+        {
+            //
+            // enum attribute 꺼내오는 방법
+            //
+
+            var status = MyStatus.Image;
+
+            //
+            // enum의 member field로는 attribute를 가져올 수 없음.
+            //
+            if(status.GetType().GetCustomAttribute<StatusAttribute>() is StatusAttribute fail)
+            {
+                Assert.Fail();
+            }
+
+            if(typeof(MyStatus).GetMember($"{status}").FirstOrDefault() is MemberInfo member)
+            {
+                if(member.GetCustomAttribute<StatusAttribute>() is StatusAttribute statusAttribute)
+                {
+                    TestContext.WriteLine(statusAttribute.Message);
+                    Assert.AreEqual(statusAttribute.Message, "이미지 상태");
+                }
+                else
+                {
+                    Assert.Fail();
+                }
+            }
+            else
+            {
+                Assert.Fail();
+            }
         }
     }
 }
