@@ -2,6 +2,9 @@
 using MyModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -16,11 +19,6 @@ namespace SampleCode
         public Person SecondPerson { get; set; }
         public TestContext TestContext { get; set; }
         #region InitVariable
-        [TestCleanup]
-        public void Cleanup()
-        {
-
-        }
 
         [TestInitialize]
         public void Initialize()
@@ -136,6 +134,45 @@ namespace SampleCode
             {
                 Assert.Fail();
             }
+        }
+
+
+        [TestMethod]
+        public void ZipTest()
+        {
+            //
+            // System.IO.Compression & System.IO.Compression.FileSystem
+            //
+            string fileName = Path.Combine(TestContext.TestRunDirectory, "sample.zip");
+            
+            //
+            // zip 파일 이름으로 stream 인스턴스 생성
+            //
+            using FileStream fileStream = new (fileName, FileMode.Create, FileAccess.Write);
+            //
+            // 생성된 stream 인스턴스 zip archive에 전달
+            //
+            using ZipArchive zipArchive = new (fileStream, ZipArchiveMode.Create);
+
+
+            foreach (var idx in Enumerable.Range(1, 10))
+            {
+                //
+                // zip 파일 안에 entry 인스턴스 생성
+                //
+                var entry = zipArchive.CreateEntry($"{idx}.txt");
+                //
+                // entry 인스턴스 stream 전달
+                //
+                using StreamWriter writer = new StreamWriter(entry.Open());
+                //
+                // 전달받은 stream write
+                //
+                writer.WriteLine($"{idx}");
+            }
+
+
+            TestContext.WriteLine(fileName);
         }
     }
 }
