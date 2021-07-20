@@ -8,6 +8,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SampleCode
@@ -143,8 +144,8 @@ namespace SampleCode
             //
             // System.IO.Compression & System.IO.Compression.FileSystem
             //
-            string fileName = Path.Combine(TestContext.TestRunDirectory, "sample.zip");
-            
+            string fileName = Path.Combine(TestContext.DeploymentDirectory, "sample.zip");
+
             //
             // zip 파일 이름으로 stream 인스턴스 생성
             //
@@ -170,7 +171,6 @@ namespace SampleCode
                 //
                 writer.WriteLine($"{idx}");
             }
-
 
             TestContext.WriteLine(fileName);
         }
