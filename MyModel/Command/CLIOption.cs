@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MyModel.Command
 {
-    
-    public class CLIOption
+    [Verb("copy", HelpText = "copy file")]
+    public class CopyOption
     {
         [Option('p', "path", Required = true, HelpText = "원본 파일 경로")]
         public string Path { get; set; }
@@ -16,5 +16,16 @@ namespace MyModel.Command
         public string DestPath { get; set; }
         [Option('o', "overwrite", HelpText = "덮어쓰기")]
         public bool Overwrite { get; set; }
+    }
+
+    [Verb("delete", HelpText = "delete file")]
+    public class DeleteOption
+    {
+        [Option('p', "path", Required = true, HelpText = "삭제 파일 경로")]
+        public string Path { get; set; }
+
+        [Option('b', "backup", Required = true, HelpText = "백업 파일 경로")]
+        public string BakupPath { get; set; }
+
     }
 }
