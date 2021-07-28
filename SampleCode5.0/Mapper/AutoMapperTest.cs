@@ -13,27 +13,54 @@ namespace SampleCode5._0
     public class AutoMapperTest
     {
         public TestContext TestContext { get; set; }
-        [TestMethod]
-        public void PersonMapperTest()
+
+        Person Person { get; set; }
+        OtherPerson OtherPerson { get; set; }
+
+        [TestInitialize]
+        public void Initialize()
         {
-            Person person = new Person()
+            Person = new Person()
             {
                 Age = 29,
-                Gender = true,
+                Gender = null,
                 Name = "최용국"
             };
 
-            OtherPerson otherPerson = new OtherPerson()
+            OtherPerson = new OtherPerson()
             {
                 Email = "opzerg9378@gmail.com"
             };
+        }
 
+        [TestMethod]
+        public void PersonNormalMapperTest()
+        {
             Mapper mapper = new Mapper(new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Person, OtherPerson>();
             }));
 
-            TestContext.WriteLine($"{mapper.Map(person, otherPerson)}");
+            TestContext.WriteLine($"{mapper.Map(Person, OtherPerson)}");
+        }
+
+        [TestMethod]
+        public void PersonForMemberMapperTest()
+        {
+            Mapper mapper = new Mapper(new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Person, OtherPerson>().ForMember(op => op.Sex, mo => mo.MapFrom(p => p.Gender ?? false));
+            }));
+
+
+            TestContext.WriteLine($"{Person}");
+            TestContext.WriteLine($"{mapper.Map(Person, OtherPerson)}");
+
+            TestContext.WriteLine("-");
+            Person.Gender = true;
+
+            TestContext.WriteLine($"{Person}");
+            TestContext.WriteLine($"{mapper.Map(Person, OtherPerson)}");
         }
     }
 }

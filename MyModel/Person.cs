@@ -30,5 +30,10 @@ namespace MyModel
         //
         [JsonIgnore]
         public ImmediateEnum Immediate { get; set; }
+
+        public override string ToString()
+        {
+            return $"이름: {Name} 나이: {Age} 성별: {Gender}";
+        }
     }
 }
