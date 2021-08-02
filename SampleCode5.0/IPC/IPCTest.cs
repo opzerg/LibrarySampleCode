@@ -51,7 +51,7 @@ namespace SampleCode5._0
             namedPipeString.Write(message);
             TestContext.WriteLine("client: bye bye~");
 
-            
+            pipeClient.Close();
         }
     }
 }
