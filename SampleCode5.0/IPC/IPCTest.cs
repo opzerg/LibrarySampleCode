@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MyModel;
 using System;
 using System.Collections.Generic;
 using System.IO.Pipes;
@@ -27,17 +28,12 @@ namespace SampleCode5._0
             await Task.Factory.StartNew(() =>
             {
                 NamedPipeServerStream pipeServer = new NamedPipeServerStream(PipeName);
-
                 pipeServer.WaitForConnection();
 
-                // read length
-                var len = pipeServer.ReadByte() * 64;
-                len += pipeServer.ReadByte();
-                byte[] inBuffer = new byte[len];
-                var rlen = pipeServer.Read(inBuffer, 0, len);
+                NamedPipeString namedPipeString = new NamedPipeString(pipeServer);
+                TestContext.WriteLine($"receive server: {namedPipeString.Read()}");
 
 
-                Console.WriteLine($"receive server: {Encoding.GetString(inBuffer, 0, rlen)}");
                 pipeServer.Close();
             });
 
@@ -50,18 +46,12 @@ namespace SampleCode5._0
 
             pipeClient.Connect();
 
-            string message = "i am client";
-            
-            byte[] outBuffer = Encoding.GetBytes(message);
-            int len = outBuffer.Length;
-
-            pipeClient.WriteByte((byte)(len / 64));
-            pipeClient.WriteByte((byte)(len * 64));
-            pipeClient.Write(outBuffer, 0, len);
-            pipeClient.Flush();
-
-            pipeClient.Close();
+            string message = "Hello World!!!";
+            NamedPipeString namedPipeString = new NamedPipeString(pipeClient);
+            namedPipeString.Write(message);
             TestContext.WriteLine("client: bye bye~");
+
+            
         }
     }
 }
